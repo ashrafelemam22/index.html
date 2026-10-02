@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Propositional Logic Exam</title>
+<style>
+:root{--bg:#f4f2f8;--card:#fff;--ink:#1d1830;--mute:#625b78;--line:#d6d0e4;--accent:#5b2a86;--accent-ink:#fff;--ok:#1b7a43;--okbg:#dff3e6;--bad:#b3261e;--badbg:#fbe4e2;--easy:#1b7a43;--med:#b36b00;--hard:#b3261e;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15111f;--card:#201a30;--ink:#ece8f5;--mute:#a79fc0;--line:#3a3252;--accent:#b88cf0;--accent-ink:#17102a;--ok:#6fdc9a;--okbg:#173624;--bad:#ff8a80;--badbg:#3d1e1c;--easy:#6fdc9a;--med:#ffb74d;--hard:#ff8a80}}
+:root[data-theme="dark"]{--bg:#15111f;--card:#201a30;--ink:#ece8f5;--mute:#a79fc0;--line:#3a3252;--accent:#b88cf0;--accent-ink:#17102a;--ok:#6fdc9a;--okbg:#173624;--bad:#ff8a80;--badbg:#3d1e1c;--easy:#6fdc9a;--med:#ffb74d;--hard:#ff8a80}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font:17px/1.5 Georgia,serif;min-height:100%}
+.wrap{max-width:680px;margin:0 auto;padding:16px}
+h1{font-size:1.25rem;margin:4px 0 14px}
+.meta{display:flex;justify-content:space-between;font:600 .9rem system-ui,sans-serif;color:var(--mute);margin-bottom:6px}
+.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin-bottom:16px}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+.lvl{font:700 1rem system-ui,sans-serif;margin:0 0 8px;padding-left:10px;border-left:5px solid}
+.lvl.easy{color:var(--easy)}.lvl.med{color:var(--med)}.lvl.hard{color:var(--hard)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px}
+.qh{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.mk{font:700 .8rem system-ui,sans-serif;background:var(--accent);color:var(--accent-ink);border-radius:20px;padding:3px 10px;white-space:nowrap}
+.q{font-size:1.1rem;font-weight:700;margin:0 0 14px}
+.opt{display:flex;gap:10px;width:100%;text-align:left;background:var(--card);color:var(--ink);border:2px solid var(--line);border-radius:8px;padding:12px;margin-bottom:10px;font:inherit;cursor:pointer;min-height:48px}
+.opt:focus-visible,.btn:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.opt.ok{border-color:var(--ok);background:var(--okbg)}
+.opt.bad{border-color:var(--bad);background:var(--badbg)}
+.opt.locked{cursor:default}
+.tag{font:700 .8rem system-ui,sans-serif;margin-left:auto;white-space:nowrap;align-self:center}
+.fb{border-radius:8px;padding:12px 14px;margin-top:6px;font:.95rem/1.45 system-ui,sans-serif;border:2px solid}
+.fb.ok{background:var(--okbg);border-color:var(--ok)}.fb.bad{background:var(--badbg);border-color:var(--bad)}
+.fb b{display:block;margin-bottom:4px}
+.nav{display:flex;gap:10px;margin-top:16px}
+.btn{flex:1;font:600 1rem system-ui,sans-serif;padding:13px;border-radius:8px;border:2px solid var(--accent);background:var(--accent);color:var(--accent-ink);cursor:pointer;min-height:48px}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn[disabled]{opacity:.4;cursor:default}
+.score{text-align:center;margin-bottom:16px}
+.score b{font-size:2.6rem;display:block}
+.rev h2{font-size:1.05rem;margin:16px 0 10px}
+.note{font:.85rem system-ui,sans-serif;color:var(--mute);margin:0 0 10px}
+.warn{font:.9rem system-ui,sans-serif;color:var(--bad);min-height:1.3em;margin-top:10px;text-align:center}
+.hide{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+<h1>Propositional Logic Exam (Total: 25 marks)</h1>
+<div id="quiz">
+  <div class="meta"><span id="num"></span><span id="ans"></span></div>
+  <div class="bar"><i id="fill"></i></div>
+  <div class="card"><p class="lvl" id="lvl"></p><div class="qh"><span></span><span class="mk" id="mk"></span></div><p class="q" id="qtext"></p><div id="opts" role="radiogroup"></div></div>
+  <div class="warn" id="warn"></div>
+  <div class="nav"><button class="btn ghost" id="prev">Previous</button><button class="btn" id="next">Next</button></div>
+</div>
+<div id="result" class="hide"></div>
+</div>
+<script>
+const LV={e:["These are easy questions","easy",1],m:["These are medium questions","med",1],h:["These are advanced questions (with tricks)","hard",2]};
+const Q0=[
+["e","Which of the following is a proposition?",["What time is it?","x + 3 = 7","5 − 2 = 4","Close the door."],2,"A proposition is a declarative sentence that is either true or false, never both. \"5 − 2 = 4\" is false, but it still has one definite value. Questions, commands, and statements with an unspecified x are not propositions."],
+["e","If P is True, what is the value of ¬P?",["True","False","Both","Cannot be determined"],1,"Negation (NOT) reverses the truth value: P = T gives ¬P = F."],
+["e","When is P ∧ Q (Conjunction, AND) True?",["When at least one is True","When both are True","When both are False","When they differ"],1,"AND is True only when both P and Q are True."],
+["e","When is P ∨ Q (Disjunction, OR) False?",["When both are False","When both are True","When P is True","When they differ"],0,"OR is False only when both P and Q are False. One True is enough to make it True."],
+["e","Which symbol represents Exclusive OR (XOR)?",["∧","∨","⊕","↔"],2,"⊕ is XOR. ∧ is AND, ∨ is OR, and ↔ is the biconditional."],
+["e","In the conditional statement P → Q, what is P called?",["Conclusion","Hypothesis","Converse","Contrapositive"],1,"In P → Q, P is the hypothesis (the assumed idea) and Q is the conclusion (the result)."],
+["e","How is P ↔ Q read?",["If P then Q","P or Q","P if and only if Q","Not P"],2,"↔ is the biconditional, read \"P if and only if Q\" (P iff Q)."],
+["m","P = True and Q = False. What is the value of P → Q?",["True","False","Both","Undefined"],1,"A conditional is False in exactly one case: the hypothesis is True and the conclusion is False."],
+["m","P = False and Q = True. What is the value of P → Q?",["False","Depends on Q","True","Undefined"],2,"When the hypothesis P is False, the implication is True regardless of Q."],
+["m","P = True and Q = True. What is the value of P ⊕ Q?",["True","False","Both","Undefined"],1,"XOR is True only when exactly one of P and Q is True. When both are True, it is False."],
+["m","What is the contrapositive of P → Q?",["Q → P","¬P → ¬Q","¬Q → ¬P","¬P → Q"],2,"The contrapositive is reversed AND negated: ¬Q → ¬P."],
+["m","What is the converse of P → Q?",["Q → P","¬P → ¬Q","¬Q → ¬P","P ← ¬Q"],0,"The converse only switches (reverses) the implication: Q → P."],
+["m","What is the inverse of P → Q?",["Q → P","¬P → ¬Q","¬Q → ¬P","P → ¬Q"],1,"The inverse only negates both parts: ¬P → ¬Q."],
+["m","A compound proposition that is always True, no matter the truth values of its parts, is called a:",["Contradiction","Contingency","Tautology","Primitive proposition"],2,"Tautology = always True. Contradiction = always False. Contingency = neither."],
+["m","Which statement is a compound proposition?",["Today is Friday.","Cairo is the capital of Egypt.","It is raining and it is cold.","5 = 3 + 2"],2,"A compound proposition is built from two or more propositions using logical operators. Here \"raining\" and \"cold\" are joined by AND."],
+["h","Trick: The converse of P → Q is logically equivalent to which statement?",["P → Q","¬Q → ¬P","¬P → ¬Q","P ∧ Q"],2,"The converse is Q → P and the inverse is ¬P → ¬Q. Each is the contrapositive of the other, so they have identical truth tables. Neither one is equivalent to the original P → Q."],
+["h","Trick: What type of compound proposition is (P → Q) ∨ (Q → P)?",["Contradiction","Contingency","Tautology","Primitive proposition"],2,"The only way P → Q is False is P = T and Q = F. In that case Q → P is True, so the OR is True. In every other row P → Q is already True. The result is always True, so it is a tautology."],
+["h","Trick: Which statement is logically equivalent to ¬(P ⊕ Q)?",["P ∧ Q","P ∨ Q","P → Q","P ↔ Q"],3,"XOR is True when P and Q differ, so its negation is True when they are the same: T,T and F,F. That is exactly the truth table of P ↔ Q."],
+["h","Trick: P = True, Q = False, R = True. What is the value of (P ∧ ¬Q) → (P ⊕ R)?",["True","False","Undefined","Cannot be determined"],1,"P ∧ ¬Q = T ∧ T = T. P ⊕ R = T ⊕ T = F. So the statement is T → F, which is False (the only False case of a conditional)."],
+["h","Trick: Let p = \"It is a holiday\" and q = \"The store is closed\". Which is the logical form of \"The store is closed whenever it is a holiday\"?",["q → p","p → q","p ↔ q","¬p → ¬q"],1,"\"Q whenever P\" means P → Q. The word order is reversed, which tricks many students into writing q → p. Whenever it is a holiday (p), the store is closed (q)."]
+];
+const L="ABCD";let cur=0,picks=[],Q=[];
+function shuf(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function build(){
+  // balanced random positions: each letter is correct ~5 times, in random order
+  const pos=shuf(Q0.map((_,i)=>i%4));
+  Q=Q0.map((q,i)=>{
+    const right=q[2][q[3]],others=shuf(q[2].filter((_,k)=>k!==q[3])),o=[];
+    for(let k=0,m=0;k<4;k++)o.push(k===pos[i]?right:others[m++]);
+    return [q[0],q[1],o,pos[i],q[4]];
+  });
+}
+const $=id=>document.getElementById(id);
+const mk=q=>LV[q[0]][2];
+const total=Q0.reduce((s,q)=>s+mk(q),0);
+function el(t,c,x){const e=document.createElement(t);if(c)e.className=c;if(x!=null)e.textContent=x;return e}
+function start(){build();cur=0;picks=Array(Q.length).fill(null);$("quiz").classList.remove("hide");$("result").classList.add("hide");$("warn").textContent="";delete $("next").dataset.confirm;render();window.scrollTo(0,0)}
+function render(){
+  const q=Q[cur],n=Q.length,p=picks[cur],a=p!==null,lv=LV[q[0]];
+  $("num").textContent="Question "+(cur+1)+" of "+n;
+  $("ans").textContent=picks.filter(x=>x!==null).length+" answered";
+  $("fill").style.width=((cur+1)/n*100)+"%";
+  const l=$("lvl");l.textContent=lv[0];l.className="lvl "+lv[1];
+  $("mk").textContent=lv[2]+(lv[2]>1?" marks":" mark");
+  $("qtext").textContent=(cur+1)+". "+q[1];
+  const box=$("opts");box.textContent="";
+  q[2].forEach((t,i)=>{
+    const b=el("button","opt"+(a?" locked"+(i===q[3]?" ok":i===p?" bad":""):""));
+    b.setAttribute("role","radio");b.setAttribute("aria-checked",p===i);
+    b.appendChild(el("span","",L[i]+")"));b.appendChild(el("span","",t));
+    if(a){if(i===q[3]&&i===p)b.appendChild(el("span","tag","✓ Your answer"));else if(i===q[3])b.appendChild(el("span","tag","✓ Correct answer"));else if(i===p)b.appendChild(el("span","tag","✗ Your answer"))}
+    b.onclick=()=>{if(picks[cur]!==null)return;picks[cur]=i;$("warn").textContent="";render()};
+    box.appendChild(b);
+  });
+  if(a){
+    const ok=p===q[3],f=el("div","fb "+(ok?"ok":"bad"));
+    f.appendChild(el("b","",ok?"✓ Correct! +"+mk(q)+(mk(q)>1?" marks":" mark"):"✗ Incorrect. The correct answer is "+L[q[3]]+") "+q[2][q[3]]));
+    f.appendChild(el("span","",q[4]));box.appendChild(f);
+  }
+  $("prev").disabled=cur===0;
+  $("next").textContent=cur===n-1?"Submit Exam":"Next";
+}
+$("prev").onclick=()=>{if(cur>0){cur--;render()}};
+$("next").onclick=()=>{
+  if(cur<Q.length-1){cur++;render();return}
+  const left=picks.filter(p=>p===null).length;
+  if(left&&!$("next").dataset.confirm){$("warn").textContent=left+" unanswered (0 marks each). Tap Submit Exam again to finish.";$("next").dataset.confirm="1";return}
+  finish();
+};
+function finish(){
+  $("quiz").classList.add("hide");
+  const r=$("result");r.classList.remove("hide");r.textContent="";
+  const score=Q.reduce((s,q,i)=>s+(picks[i]===q[3]?mk(q):0),0);
+  const sc=el("div","card score");
+  sc.appendChild(el("b","",score+" / "+total));
+  sc.appendChild(el("span","",Math.round(score/total*100)+"% — marks earned"));
+  r.appendChild(sc);
+  const rb=el("button","btn","Restart Exam");rb.onclick=start;r.appendChild(rb);
+  const rev=el("div","rev");rev.appendChild(el("h2","","Review"));
+  Q.forEach((q,i)=>{
+    const lv=LV[q[0]],c=el("div","card");c.style.marginBottom="12px";
+    c.appendChild(el("p","lvl "+lv[1],lv[0]+" · "+lv[2]+(lv[2]>1?" marks":" mark")));
+    c.appendChild(el("p","q",(i+1)+". "+q[1]));
+    q[2].forEach((t,j)=>{
+      const right=j===q[3],mine=picks[i]===j,o=el("div","opt locked"+(right?" ok":mine?" bad":""));
+      o.appendChild(el("span","",L[j]+")"));o.appendChild(el("span","",t));
+      if(right&&mine)o.appendChild(el("span","tag","✓ Your answer · Correct"));
+      else if(right)o.appendChild(el("span","tag","✓ Correct answer"));
+      else if(mine)o.appendChild(el("span","tag","✗ Your answer"));
+      c.appendChild(o);
+    });
+    if(picks[i]===null)c.appendChild(el("p","note","Not answered"));
+    c.appendChild(el("p","note","Explanation: "+q[4]));
+    rev.appendChild(c);
+  });
+  r.appendChild(rev);
+  const rb2=el("button","btn","Restart Exam");rb2.onclick=start;r.appendChild(rb2);
+  window.scrollTo(0,0);
+}
+start();
+</script>
+</body>
+</html>
